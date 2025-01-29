@@ -5,6 +5,7 @@ import marshmallow as ma
 from marshmallow import validate
 from flask_smorest import abort
 from http import HTTPStatus
+import uuid
 
 
 class ReceiptBaseSchema(ma.Schema):

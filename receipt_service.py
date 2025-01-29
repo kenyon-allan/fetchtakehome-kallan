@@ -4,8 +4,11 @@ from typing import Self
 from pydantic import BaseModel, Field
 from datetime import time, date
 import uuid
-
+import logging
 from exceptions import NoReceiptFoundException
+import math
+
+logger = logging.getLogger(__name__)
 
 
 class Item(BaseModel):
@@ -23,7 +26,7 @@ class Item(BaseModel):
         The result is the number of points earned.'
         """
         if len(self.short_description.strip()) % 3 == 0:
-            return round(self.price * 0.2)
+            return math.ceil(self.price * 0.2)
         return 0
 
 
@@ -49,28 +52,35 @@ class ReceiptData(BaseModel):
 
         # One point for every alphanumeric character in the retailer name.
         points += sum(char.isalnum() for char in self.retailer)
+        logger.debug(f"Alphanumeric - Retailer name: {self.retailer}, new total points: {points}")
 
         # 50 points if the total is a round dollar amount with no cents.
         if self.total.is_integer():
             points += 50
+        logger.debug(f"Round Dollar Total - Total: {self.total}, new total points: {points}")
 
         # 25 points if the total is a multiple of 0.25.
         if self.total % 0.25 == 0:
             points += 25
+        logger.debug(f"Total Multiple of 0.25 - Total: {self.total}, new total points: {points}")
 
         # 5 points for every two items on the receipt.
         points += len(self.items) // 2 * 5
+        logger.debug(f"5 points / pair - Num items: {len(self.items)}, new total points: {points}")
 
         # Item based points - described in the function under the item object.
         points += sum(item.calculate_item_points() for item in self.items)
+        logger.debug(f"Item based points, new total points: {points}")
 
         # 6 points if the day in the purchase date is odd.
         if self.purchase_date.day % 2 != 0:
             points += 6
+        logger.debug(f"Odd Date - Purchase date: {self.purchase_date}, new total points: {points}")
 
         # 10 points if the time of purchase is after 2:00pm and before 4:00pm.
         if self.purchase_time.hour >= 14 and self.purchase_time.hour < 16:
             points += 10
+        logger.debug(f"Time after 2 before 4 - Purchase time: {self.purchase_time}, new total points: {points}")
 
         return points
 
@@ -91,12 +101,17 @@ class ReceiptTracker:
         """Adds a receipt to the tracker."""
         receipt_id = str(uuid.uuid4())
         self.receipt_id_to_data[receipt_id] = receipt_data
+        logger.info(f"Added receipt with ID: {receipt_id}")
+        logger.debug(f"Current receipt records: {self.receipt_id_to_data}")
         return receipt_id
 
     def _get_receipt(self, receipt_id: str) -> ReceiptData:
         """Retrieves a receipt from the tracker."""
         receipt = self.receipt_id_to_data.get(receipt_id, None)
         if receipt is None:
+            logger.debug(
+                f"Receipt not found for ID: {receipt_id}, current records: {list(self.receipt_id_to_data.keys())}"
+            )
             raise NoReceiptFoundException(receipt_id)
         return receipt
 
