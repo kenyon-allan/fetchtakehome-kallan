@@ -1,3 +1,5 @@
+"""Defines input and output schemas to API endpoints used in the app."""
+
 import marshmallow as ma
 from marshmallow import validate
 
@@ -67,5 +69,39 @@ class ReceiptSchema(ma.Schema):
         metadata={
             "description": "The total amount paid on the receipt.",
             "example": "6.49",
+        },
+    )
+
+
+class OutputIDSchema(ma.Schema):
+    """API Output schema for a receipt ID."""
+
+    id = ma.fields.String(
+        validate=validate.Regexp(r"^\S+$"),
+        metadata={
+            "example": "adb6b560-0eef-42bc-9d16-df48f30e89b2",
+        },
+    )
+
+
+class InputIDSchema(ma.Schema):
+    """API Input schema for a receipt ID."""
+
+    id = ma.fields.String(
+        required=True,
+        validate=validate.Regexp(r"^\S+$"),
+        metadata={
+            "description": "The ID of the receipt.",
+        },
+    )
+
+
+class OutputPointsSchema(ma.Schema):
+    """API Output schema for points."""
+
+    points = ma.fields.Integer(
+        required=True,
+        metadata={
+            "example": "100",
         },
     )
