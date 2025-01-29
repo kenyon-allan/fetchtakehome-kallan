@@ -52,4 +52,4 @@ class TestGetPointsAPI:
         )
 
         assert response.status_code == HTTPStatus.NOT_FOUND
-        assert response.json == {"message": "No receipt found for that ID."}
+        assert response.json["message"] == "No receipt found for that ID."

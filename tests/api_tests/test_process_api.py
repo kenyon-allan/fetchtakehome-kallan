@@ -54,7 +54,7 @@ class TestProcessAPI:
         )
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json == {"message": "The receipt is invalid."}
+        assert response.json["message"] == "The receipt is invalid."
 
     @pytest.mark.parametrize("field_name", ["retailer", "purchaseDate", "purchaseTime", "items", "total"])
     def test_process_invalid_fields(
@@ -74,7 +74,7 @@ class TestProcessAPI:
         )
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json == {"message": "The receipt is invalid."}
+        assert response.json["message"] == "The receipt is invalid."
 
     def test_process_item_missing_short_description(self: Self, client: FlaskClient) -> None:
         """Tests an invalid request to the process endpoint."""
@@ -89,7 +89,7 @@ class TestProcessAPI:
         )
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json == {"message": "The receipt is invalid."}
+        assert response.json["message"] == "The receipt is invalid."
 
     def test_process_item_missing_price(self: Self, client: FlaskClient) -> None:
         """Tests an invalid request to the process endpoint."""
@@ -104,7 +104,7 @@ class TestProcessAPI:
         )
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json == {"message": "The receipt is invalid."}
+        assert response.json["message"] == "The receipt is invalid."
 
     def test_process_item_invalid_price(self: Self, client: FlaskClient) -> None:
         """Tests an invalid request to the process endpoint."""
@@ -119,7 +119,7 @@ class TestProcessAPI:
         )
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json == {"message": "The receipt is invalid."}
+        assert response.json["message"] == "The receipt is invalid."
 
     def test_process_item_invalid_short_description(self: Self, client: FlaskClient) -> None:
         """Tests an invalid request to the process endpoint."""
@@ -134,7 +134,7 @@ class TestProcessAPI:
         )
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json == {"message": "The receipt is invalid."}
+        assert response.json["message"] == "The receipt is invalid."
 
     def test_process_invalid_retailer(self: Self, client: FlaskClient) -> None:
         """Tests an invalid request to the process endpoint."""
@@ -149,7 +149,7 @@ class TestProcessAPI:
         )
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json == {"message": "The receipt is invalid."}
+        assert response.json["message"] == "The receipt is invalid."
 
     def test_process_invalid_purchase_date(self: Self, client: FlaskClient) -> None:
         """Tests an invalid request to the process endpoint."""
@@ -164,7 +164,7 @@ class TestProcessAPI:
         )
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json == {"message": "The receipt is invalid."}
+        assert response.json["message"] == "The receipt is invalid."
 
     def test_process_invalid_purchase_time(self: Self, client: FlaskClient) -> None:
         """Tests an invalid request to the process endpoint."""
@@ -179,7 +179,7 @@ class TestProcessAPI:
         )
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json == {"message": "The receipt is invalid."}
+        assert response.json["message"] == "The receipt is invalid."
 
     def test_process_invalid_total(self: Self, client: FlaskClient) -> None:
         """Tests an invalid request to the process endpoint."""
@@ -194,7 +194,7 @@ class TestProcessAPI:
         )
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json == {"message": "The receipt is invalid."}
+        assert response.json["message"] == "The receipt is invalid."
 
     def test_process_invalid_items_amount(self: Self, client: FlaskClient) -> None:
         """Tests an invalid request to the process endpoint."""
@@ -209,7 +209,7 @@ class TestProcessAPI:
         )
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json == {"message": "The receipt is invalid."}
+        assert response.json["message"] == "The receipt is invalid."
 
     def test_process_invalid_item(self: Self, client: FlaskClient) -> None:
         """Tests an invalid request to the process endpoint."""
@@ -224,4 +224,4 @@ class TestProcessAPI:
         )
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json == {"message": "The receipt is invalid."}
+        assert response.json["message"] == "The receipt is invalid."

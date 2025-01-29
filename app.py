@@ -24,10 +24,9 @@ def create_app() -> Flask:
         "OPENAPI_VERSION": "3.0.3",
     }
     app.config.update(config)
+    api = Api(app)
+    api.register_blueprint(receipts_blp)
     return app
-
-
-api = Api(create_app())
 
 
 receipts_blp = Blueprint(
@@ -77,4 +76,4 @@ class ReceiptPointsGetResource(MethodView):
             abort(http_status_code=HTTPStatus.NOT_FOUND, message="No receipt found for that ID.")
 
 
-api.register_blueprint(receipts_blp)
+create_app()
