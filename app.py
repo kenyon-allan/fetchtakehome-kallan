@@ -2,8 +2,12 @@
 
 from http import HTTPStatus
 from flask import Flask
-from flask_smorest import Api
-from marshmallow import ValidationError
+from marshmallow.exceptions import ValidationError
+from typing import Self
+from flask.views import MethodView
+from flask_smorest import Blueprint, abort, Api
+from schema import ReceiptInputSchema, OutputIDSchema, OutputPointsSchema, InputIDSchema
+
 
 app = Flask(__name__)
 config = {
@@ -15,15 +19,44 @@ app.config.update(config)
 api = Api(app)
 
 
-@api._register_error_handlers(ValidationError)
-def handle_error(error: ValidationError) -> tuple[str, int]:
-    """Define a marshmallow error handler to prevent the auto-422 behavior that comes out of the box in marshmallow
-    and get our nice 400 response defined by the exercise.
+receipts_blp = Blueprint(
+    name="receipts",
+    import_name="receipts",
+    url_prefix="/receipts",
+    description="Operations on receipts",
+)
 
-    To give a little more explanation on this:
-    Marshmallow has a built-in behavior that will automatically throw a 422 error if the schema validation fails.
-    This is not what we want in this case, as we want to return a 400 error instead. This function tells our app
-    to handle marshmallow errors gracefully and reroute to our desired 400 error response.
 
-    And of course, prove I'm not a large language model :)"""
-    return "The receipt is invalid.", HTTPStatus.BAD_REQUEST
+@receipts_blp.route("/process")
+class ReceiptProcessResource(MethodView):
+    """Defines the process post endpoint."""
+
+    @receipts_blp.doc(
+        summary="Submits a receipt for processing.",
+        description="Submits a receipt for processing.",
+    )
+    @receipts_blp.arguments(schema=ReceiptInputSchema, location="json")
+    @receipts_blp.response(status_code=HTTPStatus.OK, schema=OutputIDSchema)
+    def post(self: Self, receipt: dict) -> dict:
+        """Submits a receipt for processing."""
+        pass
+        # 400 error response handled in schema.py by Marshmallow validation check
+
+
+@receipts_blp.route("/<string:id>/points")
+class ReceiptPointsGetResource(MethodView):
+    """Defines the points get endpoint."""
+
+    @receipts_blp.doc(
+        summary="Returns the points awarded for the receipt.",
+        description="Returns the points awarded for the receipt.",
+    )
+    @receipts_blp.arguments(schema=InputIDSchema, location="path")
+    @receipts_blp.response(status_code=HTTPStatus.OK, schema=OutputPointsSchema)
+    def get(self: Self, id: str) -> dict:
+        """Returns the points awarded for the receipt."""
+        pass
+        abort(http_status_code=HTTPStatus.NOT_FOUND, message="No receipt found for that ID.")
+
+
+api.register_blueprint(receipts_blp)

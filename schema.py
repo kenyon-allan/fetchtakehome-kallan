@@ -1,10 +1,13 @@
 """Defines input and output schemas to API endpoints used in the app."""
 
+from typing import Self
 import marshmallow as ma
 from marshmallow import validate
+from flask_smorest import abort
+from http import HTTPStatus
 
 
-class ReceiptSchema(ma.Schema):
+class ReceiptBaseSchema(ma.Schema):
     """API Input schema for a receipt."""
 
     class ItemSchema(ma.Schema):
@@ -71,6 +74,26 @@ class ReceiptSchema(ma.Schema):
             "example": "6.49",
         },
     )
+
+
+class ReceiptInputSchema(ReceiptBaseSchema):
+    """Wrapper class for the receipt schema that will be used in the API."""
+
+    @ma.pre_load
+    def overwrite_422_behavior(self: Self, data: dict, **kwargs: dict) -> dict:
+        """Define a marshmallow error handler to prevent the auto-422 behavior that comes out of the box in marshmallow
+        and get our nice 400 response defined by the exercise, and of course, prove I'm not a large language model :)
+
+        Why is this a wrapper class?
+        We want to be able to call .load() on this schema to validate the incoming data during 'pre-load'.
+        So if we do this in the class itself, it will continually call itself before loading and infinitely recurse.
+        This is a way to get around that.
+        """
+        try:
+            ReceiptBaseSchema().load(data)
+        except ma.ValidationError as err:
+            abort(http_status_code=HTTPStatus.BAD_REQUEST, message="The receipt is invalid.")
+        return data
 
 
 class OutputIDSchema(ma.Schema):
