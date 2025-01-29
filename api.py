@@ -45,3 +45,6 @@ class ReceiptPointsGetResource(MethodView):
         """Returns the points awarded for the receipt."""
         pass
         abort(http_status_code=HTTPStatus.NOT_FOUND, message="No receipt found for that ID.")
+
+
+api.register_blueprint(receipts_blp)
