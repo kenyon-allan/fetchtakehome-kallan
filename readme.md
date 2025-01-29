@@ -1,0 +1,2 @@
+## Notes and Assumptions
+- I noticed that all of the regex patterns included in the spec use double escaped backslashes. I'm assuming that the intention is for them to not actually be escaped this way to make sense (i.e. \\w is supposed to be \w).
