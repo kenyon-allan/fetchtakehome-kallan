@@ -14,14 +14,20 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
-config = {
-    "API_TITLE": "Receipt Processor",
-    "API_VERSION": "v1.0.0",
-    "OPENAPI_VERSION": "3.0.3",
-}
-app.config.update(config)
-api = Api(app)
+
+def create_app() -> Flask:
+    """Creates the flask app."""
+    app = Flask(__name__)
+    config = {
+        "API_TITLE": "Receipt Processor",
+        "API_VERSION": "v1.0.0",
+        "OPENAPI_VERSION": "3.0.3",
+    }
+    app.config.update(config)
+    return app
+
+
+api = Api(create_app())
 
 
 receipts_blp = Blueprint(

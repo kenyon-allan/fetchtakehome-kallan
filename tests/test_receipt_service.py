@@ -1,6 +1,8 @@
 """Tests the receipt_service"""
 
 from typing import Self
+from unittest.mock import patch
+from exceptions import NoReceiptFoundException
 from receipt_service import Item, ReceiptData, ReceiptTracker
 from datetime import date, time
 import pytest
@@ -173,3 +175,77 @@ class TestReceiptData:
         )
 
         assert receipt.calculate_points() == 109
+
+
+@patch("receipt_service.uuid.uuid4", lambda: "1")
+@patch("receipt_service.ReceiptData.calculate_points", lambda self: 1)
+class TestReceiptTracker:
+    """Tests the receipttracker class."""
+
+    @pytest.fixture(autouse=True)
+    def tracker_reset(self: Self):
+        """Resets the tracker between tests."""
+        yield
+        tracker = ReceiptTracker()
+        tracker.receipt_id_to_data = {}
+        tracker.receipt_id_to_points = {}
+
+    def test_add_receipt(self: Self) -> None:
+        """Tests the add_receipt method."""
+        tracker = ReceiptTracker()
+        receipt = ReceiptData(
+            retailer="aaa",
+            purchaseDate=date(2025, 1, 1),
+            purchaseTime=time(0, 0, 0),
+            items=[Item(shortDescription="abc", price=10.00)],
+            total=1.00,
+        )
+        tracker.add_receipt(receipt)
+        assert tracker.receipt_id_to_data == {"1": receipt}
+
+    def test_get_receipt_valid(self: Self) -> None:
+        """Tests the get_receipt method with a valid receipt."""
+        tracker = ReceiptTracker()
+        receipt = ReceiptData(
+            retailer="aaa",
+            purchaseDate=date(2025, 1, 1),
+            purchaseTime=time(0, 0, 0),
+            items=[Item(shortDescription="abc", price=10.00)],
+            total=1.00,
+        )
+        tracker.add_receipt(receipt)
+        assert tracker._get_receipt("1") == receipt
+
+    def test_get_receipt_invalid(self: Self) -> None:
+        """Tests the get_receipt method with an invalid receipt."""
+        tracker = ReceiptTracker()
+        with pytest.raises(NoReceiptFoundException):
+            tracker._get_receipt("1")
+
+    def test_get_points_for_receipt_valid(self: Self) -> None:
+        """Tests the get_points_for_receipt method with a valid receipt."""
+        tracker = ReceiptTracker()
+        receipt = ReceiptData(
+            retailer="aaa",
+            purchaseDate=date(2025, 1, 1),
+            purchaseTime=time(0, 0, 0),
+            items=[Item(shortDescription="abc", price=10.00)],
+            total=1.00,
+        )
+        tracker.add_receipt(receipt)
+        assert tracker.get_points_for_receipt("1") == 1
+        assert tracker.receipt_id_to_points == {"1": 1}
+
+    def test_get_points_for_receipt_already_gotten_once(self: Self) -> None:
+        """Tests the get_points_for_receipt method with a valid receipt that has already been gotten once."""
+        tracker = ReceiptTracker()
+        receipt = ReceiptData(
+            retailer="aaa",
+            purchaseDate=date(2025, 1, 1),
+            purchaseTime=time(0, 0, 0),
+            items=[Item(shortDescription="abc", price=10.00)],
+            total=1.00,
+        )
+        tracker.add_receipt(receipt)
+        tracker.get_points_for_receipt("1")
+        tracker.get_points_for_receipt("1")  # second call should reference the cache.
