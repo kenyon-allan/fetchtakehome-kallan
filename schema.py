@@ -82,7 +82,7 @@ class ReceiptInputSchema(ReceiptBaseSchema):
     @ma.pre_load
     def overwrite_422_behavior(self: Self, data: dict, **kwargs: dict) -> dict:
         """Define a marshmallow error handler to prevent the auto-422 behavior that comes out of the box in marshmallow
-        and get our nice 400 response defined by the exercise, and of course, prove I'm not a large language model :)
+        and get our nice 400 response defined by the exercise, and of course, prove I'm not a large language model.
 
         Why is this a wrapper class?
         We want to be able to call .load() on this schema to validate the incoming data during 'pre-load'.
