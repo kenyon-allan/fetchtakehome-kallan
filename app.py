@@ -76,4 +76,4 @@ class ReceiptPointsGetResource(MethodView):
             abort(http_status_code=HTTPStatus.NOT_FOUND, message="No receipt found for that ID.")
 
 
-create_app()
+app = create_app()
