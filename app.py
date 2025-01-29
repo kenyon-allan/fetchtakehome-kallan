@@ -6,6 +6,8 @@ from marshmallow.exceptions import ValidationError
 from typing import Self
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort, Api
+from exceptions import NoReceiptFoundException
+from receipt_service import ReceiptData, ReceiptTracker
 from schema import ReceiptInputSchema, OutputIDSchema, OutputPointsSchema, InputIDSchema
 
 
@@ -39,7 +41,9 @@ class ReceiptProcessResource(MethodView):
     @receipts_blp.response(status_code=HTTPStatus.OK, schema=OutputIDSchema)
     def post(self: Self, receipt: dict) -> dict:
         """Submits a receipt for processing."""
-        pass
+        receipt_model = ReceiptData(**receipt)
+        receipt_id = ReceiptTracker().add_receipt(receipt_model)
+        return {"id": receipt_id}
         # 400 error response handled in schema.py by Marshmallow validation check
 
 
@@ -55,8 +59,11 @@ class ReceiptPointsGetResource(MethodView):
     @receipts_blp.response(status_code=HTTPStatus.OK, schema=OutputPointsSchema)
     def get(self: Self, id: str) -> dict:
         """Returns the points awarded for the receipt."""
-        pass
-        abort(http_status_code=HTTPStatus.NOT_FOUND, message="No receipt found for that ID.")
+        try:
+            points = ReceiptTracker.get_points_for_receipt(id)
+            return {"points": points}
+        except NoReceiptFoundException:
+            abort(http_status_code=HTTPStatus.NOT_FOUND, message="No receipt found for that ID.")
 
 
 api.register_blueprint(receipts_blp)

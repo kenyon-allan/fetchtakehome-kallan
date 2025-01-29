@@ -13,7 +13,7 @@ class ReceiptBaseSchema(ma.Schema):
     class ItemSchema(ma.Schema):
         """Sub-schema object for an item on a receipt."""
 
-        short_description = ma.fields.String(
+        shortDescription = ma.fields.String(
             required=True,
             validate=validate.Regexp(r"^[\w\s\-]+$"),
             metadata={
@@ -41,7 +41,7 @@ class ReceiptBaseSchema(ma.Schema):
         },
     )
 
-    purchase_date = ma.fields.Date(
+    purchaseDate = ma.fields.Date(
         required=True,
         format="%Y-%m-%d",
         metadata={
@@ -50,7 +50,7 @@ class ReceiptBaseSchema(ma.Schema):
         },
     )
 
-    purchase_time = ma.fields.Time(
+    purchaseTime = ma.fields.Time(
         required=True,
         format="%H:%M",
         metadata={

@@ -1,1 +1,2 @@
 flask-smorest # Includes Flask and Marshmallow
+pydantic # Data validation and settings management using Python type hints
